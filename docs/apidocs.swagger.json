@@ -1,0 +1,321 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Key.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/keys": {
+      "get": {
+        "summary": "Get key list (with explicit page number)",
+        "operationId": "KeyService_GetPage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/exampleKeyPageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_number",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "KeyService"
+        ]
+      },
+      "post": {
+        "summary": "Adding a new key",
+        "operationId": "KeyService_AddKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/exampleV1RfidDto"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "The key resource to create.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/exampleV1RfidDto"
+            }
+          }
+        ],
+        "tags": [
+          "KeyService"
+        ]
+      }
+    },
+    "/v1/keys-continued-list": {
+      "get": {
+        "summary": "Get continued key list by token (another GetPage variant)",
+        "operationId": "KeyService_GetPageContinued",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/exampleListKeysResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "KeyService"
+        ]
+      }
+    },
+    "/v1/keys/{id}": {
+      "get": {
+        "summary": "Get key by ID",
+        "operationId": "KeyService_GetKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/exampleV1RfidDto"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "KeyService"
+        ]
+      },
+      "delete": {
+        "summary": "Delete key by ID",
+        "operationId": "KeyService_DeleteKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/exampleV1RfidDto"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "KeyService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "exampleAddingKeyStatus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "boolean"
+        }
+      },
+      "title": "Represents the status of key adding"
+    },
+    "exampleKeyPageResponse": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleV1RfidDto"
+          }
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_number": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "page_size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "is_first": {
+          "type": "boolean"
+        },
+        "is_last": {
+          "type": "boolean"
+        }
+      },
+      "title": "Response for GetPage"
+    },
+    "exampleListKeysResponse": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleV1RfidDto"
+          }
+        },
+        "next_page_token": {
+          "type": "string"
+        }
+      },
+      "title": "Response for GetPageContinued"
+    },
+    "exampleV1RfidDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "key": {
+          "type": "string"
+        }
+      },
+      "title": "Represents the key"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

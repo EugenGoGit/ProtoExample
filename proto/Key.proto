@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+package com.example;
+
+option go_package = "com.example";
+
+
+//Represents the key
+message V1RfidDto {
+  int32 id = 1; /// Unique key ID
+  string key = 2 [(validator.field) = {string_not_empty: true, length_lt: 255}]; /// Key body
+}
+
+// Request message for AddKey method.
+message AddKeyRequest {
+  // The key resource to create.
+  V1RfidDto key = 1;
+}
+
+// Request message for GetKey, DeleteKey methods.
+message GetKeyRequest {
+  int32 id = 1; /// Unique key ID
+}
+
+//Represents the status of key adding
+message AddingKeyStatus {
+  int32 id = 1; /// Unique key ID.
+  bool status = 2; /// Status of operation
+}
+
+// Request message for GetPageContinued
+message ListKeysRequest {
+  int32 page_size = 1; //  The maximum number of results
+  string page_token = 2; // Specific page of the list results. The next_page_token value returned from a previous List request
+}
+
+// Response for GetPageContinued
+message ListKeysResponse {
+  repeated V1RfidDto keys = 1; // Current page key list
+  string next_page_token = 2; // Represents the pagination token to retrieve the next page of results. If the value is "", it means no further results for the request
+}
+
+// Request message for GetPage
+message GetPageRequest {
+  int32 page_number = 1; /// Page number to get
+  int32 page_size = 2; /// Wanted keys count for page
+}
+
+// Response for GetPage
+message KeyPageResponse {
+  repeated V1RfidDto keys = 1; /// List of keys for requested page
+  int32 count = 2; /// Result Keys count for requested page
+  int32 total_count = 3; /// Total keys count
+  int32 page_number = 4; /// Requested page number to get
+  int32 page_size = 5; /// Wanted keys count for page
+  bool is_first = 6; /// First page flag
+  bool is_last = 7; /// Last page flag
+}
+
+// Service for keys exchanging
+service KeyService {
+  // Adding a new key
+  rpc AddKey(AddKeyRequest) returns (V1RfidDto) {
+    option (google.api.http) = {
+      post: "/v1/keys"
+      body: "key"
+    };
+  }
+
+  // Get key by ID
+  rpc GetKey(GetKeyRequest) returns (V1RfidDto) {
+    option (google.api.http) = { get: "/v1/keys/{id}" };
+  }
+
+  // Delete key by ID
+  rpc DeleteKey(GetKeyRequest) returns (V1RfidDto) {
+    option (google.api.http) = { delete: "/v1/keys/{id}" };
+  }
+
+
+
+  // Used to bidirectional stream adding.
+  rpc StreamAddKey (stream AddKeyRequest) returns (stream AddingKeyStatus);
+
+
+
+  // Get key list (with explicit page number)
+  rpc GetPage(GetPageRequest) returns (KeyPageResponse) {
+    option (google.api.http) = { get: "/v1/keys" };
+  }
+
+  // Get continued key list by token (another GetPage variant)
+  rpc GetPageContinued(ListKeysRequest) returns (ListKeysResponse) {
+    option (google.api.http) = { get: "/v1/keys-continued-list" };
+  }
+}
+
+
+
+
+

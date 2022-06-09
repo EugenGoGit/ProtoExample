@@ -1,0 +1,79 @@
+version: "2.4"
+
+services:
+  protoc-gen-doc-md:
+    image: pseudomuto/protoc-gen-doc
+    volumes:
+      - ./docs:/out
+      - ./proto:/protos
+    command: ["--doc_opt=markdown,index.md"]
+
+  protoc-gen-doc-html:
+    image: pseudomuto/protoc-gen-doc
+    volumes:
+      - ./docs:/out
+      - ./proto:/protos
+    command: ["--doc_opt=html,index.html"]
+
+  mkdocs:
+    image: squidfunk/mkdocs-material
+    volumes:
+      - ./mkdocs-material/mkdocs.yml:/docs/mkdocs.yml
+      - ./docs/index.md:/docs/docs/index.md
+    ports:
+      - 8080:8000
+    links:
+      - protoc-gen-doc-md
+
+  grpc-gateway-swagger-ui:
+    image: hiro/grpc-gateway-swagger-ui
+    volumes:
+      - ./proto:/proto
+      - ./docs:/api
+    ports:
+      - 3000:3000
+
+  protoc-all-go:
+    image: namely/protoc-all
+    volumes:
+      - ./proto:/defs
+      - ./src:/out
+    command: ["-o","/out","-f","Key.proto","-l","go"]
+
+  protoc-all-python:
+    image: namely/protoc-all
+    volumes:
+      - ./proto:/defs
+      - ./src:/out
+    command: ["-o","/out","-f","Key.proto","-l","python"]
+
+  protoc-all-csharp:
+    image: namely/protoc-all
+    volumes:
+      - ./proto:/defs
+      - ./src:/out
+    command: ["-o","/out","-f","Key.proto","-l","csharp"]
+
+  docker-go-swagger-client:
+    image: flexconstructor/go-swagger
+    working_dir: /client
+    volumes:
+      - ./client:/client
+      - ./docs/apidocs.swagger.json:/swagger.json
+    command: ["generate","client","-f","/swagger.json"]
+    links:
+      - grpc-gateway-swagger-ui
+
+  docker-go-swagger-server:
+    image: flexconstructor/go-swagger
+    working_dir: /server
+    volumes:
+      - ./server:/server
+      - ./docs/apidocs.swagger.json:/swagger.json
+    command: ["generate","server","-f","/swagger.json"]
+    links:
+      - grpc-gateway-swagger-ui
+
+
+
+
